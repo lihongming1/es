@@ -135,6 +135,21 @@ public class EsUtils {
     }
 
     /**
+     * 批量查询
+     * @param jestClient
+     * @param indexName
+     * @param indexType
+     * @param indexIds
+     * @return
+     * @throws Exception
+     */
+    public static String getMultiGet(JestClient jestClient, String indexName, String indexType, List<String> indexIds) throws Exception {
+        MultiGet multiGet = new MultiGet.Builder.ById(indexName, indexType).addId(indexIds).build();
+        JestResult result = jestClient.execute(multiGet);
+        return result.getJsonString();
+    }
+
+    /**
      * 删除文档
      *
      * @param jestClient
