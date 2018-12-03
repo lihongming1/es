@@ -53,6 +53,7 @@ public class EsUtils {
 
     /**
      * 创建Mapping
+     *
      * @param jestClient
      * @param indexName
      * @param indexType
@@ -60,7 +61,7 @@ public class EsUtils {
      * @return
      * @throws Exception
      */
-    public static String putMapping(JestClient jestClient, String indexName, String indexType, XContentBuilder xContentBuilder) throws Exception{
+    public static String putMapping(JestClient jestClient, String indexName, String indexType, XContentBuilder xContentBuilder) throws Exception {
         String json = Strings.toString(xContentBuilder);
         PutMapping putMapping = new PutMapping.Builder(indexName, indexType, json).build();
         JestResult result = jestClient.execute(putMapping);
@@ -69,6 +70,7 @@ public class EsUtils {
 
     /**
      * 新增或更新索引
+     *
      * @param jestClient
      * @param indexName
      * @param indexType
@@ -88,6 +90,7 @@ public class EsUtils {
 
     /**
      * 批量- 新增或更新索引
+     *
      * @param jestClient
      * @param indexName
      * @param indexType
@@ -96,10 +99,10 @@ public class EsUtils {
      * @throws Exception
      */
     public static String batchSaveUpdateIndex(JestClient jestClient, String indexName, String indexType, List<String> sources, EsExt ext) throws Exception {
-        if(ext != null){
+        if (ext != null) {
             // 执行扩展功能
             return ext.ext();
-        }else{
+        } else {
             Bulk.Builder bulkBuilder = new Bulk.Builder().defaultIndex(indexName).defaultType(indexType);
             //循环构造批量数据
             for (String source : sources) {
@@ -114,6 +117,7 @@ public class EsUtils {
 
     /**
      * 获取文档
+     *
      * @param jestClient
      * @param indexName
      * @param indexType
@@ -121,7 +125,7 @@ public class EsUtils {
      * @return
      * @throws Exception
      */
-    public static String getDoc(JestClient jestClient, String indexName, String indexType, String indexId) throws Exception{
+    public static String getDoc(JestClient jestClient, String indexName, String indexType, String indexId) throws Exception {
         Get get = new Get.Builder(indexName, indexId).type(indexType).build();
         JestResult result = jestClient.execute(get);
         return result.getJsonString();
@@ -129,6 +133,7 @@ public class EsUtils {
 
     /**
      * 删除文档
+     *
      * @param jestClient
      * @param indexName
      * @param indexType
@@ -136,9 +141,36 @@ public class EsUtils {
      * @return
      * @throws Exception
      */
-    public static String deleteDoc(JestClient jestClient, String indexName, String indexType, String indexId) throws Exception{
+    public static String deleteDoc(JestClient jestClient, String indexName, String indexType, String indexId) throws Exception {
         Delete delete = new Delete.Builder(indexId).index(indexName).type(indexType).build();
         JestResult result = jestClient.execute(delete);
+        return result.getJsonString();
+    }
+
+    /**
+     * 更新文档
+     *
+     * @param jestClient
+     * @param indexName
+     * @param indexType
+     * @param indexId
+     * @param script
+     * @return
+     * @throws Exception
+     */
+    public static String updateDoc(JestClient jestClient, String indexName, String indexType, String indexId, String script) throws Exception {
+        /*String script = "{" +
+                "    \"doc\" : {" +
+                "        \"title\" : \""+article.getTitle()+"\"," +
+                "        \"content\" : \""+article.getContent()+"\"," +
+                "        \"author\" : \""+article.getAuthor()+"\"," +
+                "        \"source\" : \""+article.getSource()+"\"," +
+                "        \"url\" : \""+article.getUrl()+"\"," +
+                "        \"pubdate\" : \""+new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(article.getPubdate())+"\"" +
+                "    }" +
+                "}";*/
+        Update update = new Update.Builder(script).index(indexName).type(indexType).id(indexId).build();
+        JestResult result = jestClient.execute(update);
         return result.getJsonString();
     }
 

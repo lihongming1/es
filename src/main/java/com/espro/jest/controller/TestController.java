@@ -57,7 +57,21 @@ public class TestController {
 //
 //        String resultJson = EsTool.batchSaveUpdateIndex(jestClient, "index1", "blog", list);
 
-        String resultJson = EsUtils.deleteDoc(jestClient, "index1", "blog","1s");
+//        String resultJson = EsUtils.deleteDoc(jestClient, "index1", "blog","1s");
+
+        String resultJson = EsUtils.getDoc(jestClient, "index1", "blog","ZwtiY2cB8Hije5e7AaFK");
+
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("id", "3");
+        map2.put("title", "ES设计模式!!!");
+        map2.put("content", "在不ES情况下，!!!");
+        map2.put("postdate", "2018-12-04 14:38:00");
+        map2.put("url", "csdn.net/SSSSSSSS111111");
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("doc", map2);
+
+        resultJson = EsUtils.updateDoc(jestClient, "index1", "blog","ZwtiY2cB8Hije5e7AaFK", JsonUtils.toJson(map));
 
         return resultJson;
     }
