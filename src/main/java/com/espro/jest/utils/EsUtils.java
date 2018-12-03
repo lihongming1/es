@@ -4,8 +4,11 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;
 import io.searchbox.indices.mapping.PutMapping;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -154,21 +157,35 @@ public class EsUtils {
      * @param indexName
      * @param indexType
      * @param indexId
-     * @param script
+     * @param source
      * @return
      * @throws Exception
      */
-    public static String updateDoc(JestClient jestClient, String indexName, String indexType, String indexId, String script) throws Exception {
-        /*String script = "{" +
-                "    \"doc\" : {" +
-                "        \"title\" : \""+article.getTitle()+"\"," +
-                "        \"content\" : \""+article.getContent()+"\"," +
-                "        \"author\" : \""+article.getAuthor()+"\"," +
-                "        \"source\" : \""+article.getSource()+"\"," +
-                "        \"url\" : \""+article.getUrl()+"\"," +
-                "        \"pubdate\" : \""+new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(article.getPubdate())+"\"" +
-                "    }" +
-                "}";*/
+    public static String updateDoc(JestClient jestClient, String indexName, String indexType, String indexId, Map<String, String> source) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("doc", source);
+        String script = JsonUtils.toJson(map);
+        Update update = new Update.Builder(script).index(indexName).type(indexType).id(indexId).build();
+        JestResult result = jestClient.execute(update);
+        return result.getJsonString();
+    }
+
+    /**
+     * 文档upsert操作：如果文档存在则执行更新操作，否则执行添加操作
+     *
+     * @param jestClient
+     * @param indexName
+     * @param indexType
+     * @param indexId
+     * @param source
+     * @return
+     * @throws Exception
+     */
+    public static String upsertDoc(JestClient jestClient, String indexName, String indexType, String indexId, Map<String, String> source) throws Exception {
+        Map<String, Object> scriptMap = new HashMap<>();
+        scriptMap.put("doc", source);
+        scriptMap.put("doc_as_upsert", true);
+        String script = JsonUtils.toJson(scriptMap);
         Update update = new Update.Builder(script).index(indexName).type(indexType).id(indexId).build();
         JestResult result = jestClient.execute(update);
         return result.getJsonString();
