@@ -1,5 +1,6 @@
 package com.espro.jest.utils;
 
+import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.*;
@@ -203,6 +204,20 @@ public class EsUtils {
         String script = JsonUtils.toJson(scriptMap);
         Update update = new Update.Builder(script).index(indexName).type(indexType).id(indexId).build();
         JestResult result = jestClient.execute(update);
+        return result.getJsonString();
+    }
+
+    /**
+     * search
+     * @param jestClient
+     * @param indexName
+     * @return
+     * @throws Exception
+     */
+    public static String search(JestClient jestClient, String indexName) throws Exception{
+        String query = "{\"query\" : { \"match\" : { \"content\" : \"功能\" } }}";
+        Action search = new Search.Builder(query).addIndex(indexName).build();
+        JestResult result = jestClient.execute(search);
         return result.getJsonString();
     }
 
