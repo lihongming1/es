@@ -1,5 +1,6 @@
 package com.espro.jest.controller;
 
+import com.espro.jest.canal.CanalClient;
 import com.espro.jest.utils.EsExt;
 import com.espro.jest.utils.EsTool;
 import com.espro.jest.utils.EsUtils;
@@ -82,9 +83,11 @@ public class TestController {
 //
 //        String resultJson = EsUtils.upsertDoc(jestClient, "index1", "blog","ZwtiY2cB8Hije5e7AaFK", map2);
 
-        String resultJson = EsUtils.search(jestClient, "index1");
+//        String resultJson = EsUtils.search(jestClient, "index1");
 
-        return resultJson;
+        CanalClient.synES(jestClient);
+
+        return null;
     }
 
 }
